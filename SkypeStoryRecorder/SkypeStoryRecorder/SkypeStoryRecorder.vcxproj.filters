@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\機械">
+      <UniqueIdentifier>{83745029-6f83-4a12-b5b9-f4aab3aec4ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\機械">
+      <UniqueIdentifier>{46bd0dc8-029e-472d-8db2-30804222da02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\部品">
+      <UniqueIdentifier>{07f84dea-8a93-4088-96f3-ed6e7bcb8d24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\部品">
+      <UniqueIdentifier>{3a12d597-469a-45a5-91b6-a4d1fa911f70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\情報">
+      <UniqueIdentifier>{e62d04ff-6921-4175-b95e-7af1d2e3c826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\情報">
+      <UniqueIdentifier>{e635f3e7-8b56-4e53-80dc-61f73a28eae2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>ソース ファイル\情報</Filter>
+    </ClCompile>
+    <ClCompile Include="DataConverter.cpp">
+      <Filter>ソース ファイル\機械</Filter>
+    </ClCompile>
+    <ClCompile Include="DataManager.cpp">
+      <Filter>ソース ファイル\機械</Filter>
+    </ClCompile>
+    <ClCompile Include="Date.cpp">
+      <Filter>ソース ファイル\部品</Filter>
+    </ClCompile>
+    <ClCompile Include="SentenceDecoder.cpp">
+      <Filter>ソース ファイル\機械</Filter>
+    </ClCompile>
+    <ClCompile Include="SkypeStoryRecorder.cpp">
+      <Filter>ソース ファイル\機械</Filter>
+    </ClCompile>
+    <ClCompile Include="TagData.cpp">
+      <Filter>ソース ファイル\部品</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h">
+      <Filter>ヘッダー ファイル\情報</Filter>
+    </ClInclude>
+    <ClInclude Include="DataConverter.h">
+      <Filter>ヘッダー ファイル\機械</Filter>
+    </ClInclude>
+    <ClInclude Include="DataManager.h">
+      <Filter>ヘッダー ファイル\機械</Filter>
+    </ClInclude>
+    <ClInclude Include="Story.h">
+      <Filter>ヘッダー ファイル\部品</Filter>
+    </ClInclude>
+    <ClInclude Include="TagData.h">
+      <Filter>ヘッダー ファイル\部品</Filter>
+    </ClInclude>
+    <ClInclude Include="Date.h">
+      <Filter>ヘッダー ファイル\部品</Filter>
+    </ClInclude>
+    <ClInclude Include="Sentence.h">
+      <Filter>ヘッダー ファイル\部品</Filter>
+    </ClInclude>
+    <ClInclude Include="SentenceDecoder.h">
+      <Filter>ヘッダー ファイル\機械</Filter>
+    </ClInclude>
+    <ClInclude Include="SkypeStoryRecorder.h">
+      <Filter>ヘッダー ファイル\機械</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="memo.txt">
+      <Filter>リソース ファイル</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
