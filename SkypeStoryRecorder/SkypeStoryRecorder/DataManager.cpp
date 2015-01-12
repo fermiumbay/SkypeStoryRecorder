@@ -403,7 +403,7 @@ bool DataManager::SaveTxtDetail(string path){
 		ofs << endl;
 	}
 
-	if (story.mainChara.size() > 0 || story.subChara.size() > 0){
+	if (story.mainChara.size() > 0){
 		ofs << "y“oêƒƒCƒ“ƒLƒƒƒ‰z" << endl;
 		bool firstFlg = false;
 		for (auto p : story.mainChara){
@@ -411,8 +411,11 @@ bool DataManager::SaveTxtDetail(string path){
 			firstFlg = true;
 		}
 		ofs << endl << endl;
+	}
+
+	if (story.subChara.size() > 0){
 		ofs << "y“oêƒTƒuƒLƒƒƒ‰z" << endl;
-		firstFlg = false;
+		bool firstFlg = false;
 		for (auto p : story.subChara){
 			ofs << (!firstFlg ? "" : ", ") << p;
 			firstFlg = true;
@@ -423,6 +426,9 @@ bool DataManager::SaveTxtDetail(string path){
 	const string border = "------------------------------------------------\n";
 	ofs << border;
 	for (auto p : story.sentence){
+		if (p.text == "" && p.note == ""){
+			continue;
+		}
 		ofs << "”­Œ¾ŽÒ : " << p.speaker << endl;
 		ofs << "”­Œ¾“úŽž : " << p.makeDate.GetStr() << endl;
 		ofs << (p.state == Sentence::State::edited ? "•ÒW“úŽž : " : "");

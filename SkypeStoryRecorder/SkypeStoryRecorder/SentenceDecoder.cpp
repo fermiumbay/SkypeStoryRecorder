@@ -114,6 +114,7 @@ vector<Story> SentenceDecoder::CreateStoryList(){
 					}
 					else if (buf == common::GetSummaryCommand()){
 						// 要約開始
+						story.summary = "";	// 要約が増えるのを防ぐため、初期化
 						summaryFlg = true;
 						buf = "";
 					}

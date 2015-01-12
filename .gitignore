@@ -25,3 +25,9 @@ ipch
 # SkypeStoryRecorder
 dat
 story
+
+# HSP
+hsptmp
+obj
+packfile
+start.ax

@@ -1,0 +1,419 @@
+#define tn "スカイプ物語レコーダー"
+#packopt name tn
+#packopt hide 1
+#include "obj.as"
+#define WM_SIZE 5
+
+#include "hspda.as"
+#include "hspext.as"
+
+#define UpdateFilePath "dat\\update.dat"
+#define copyMessage dialog "コマンドをテキストとしてコピーしました。\nスカイプのメッセージボックスに貼り付けてください。\n各データはストーリーの更新時に適用されます。", , tn
+
+url = dir_cur
+
+screen 0, 320, 240, , 50, 50
+title tn
+mes "物語データ取得中..."
+
+// update.datからタイトルと更新日時を取得
+updateNum = 0
+exist UpdateFilePath
+if strsize ! -1{
+	sdim updatePath, 256
+	sdim updateDate, 64
+	
+	r = ""
+	notesel r
+	noteload UpdateFilePath
+	fileFlg = 0
+	repeat notemax
+		noteget k, cnt
+		if fileFlg = 0{
+			if k = "<file>"{
+				fileFlg = 1
+			}
+		}else{
+			if k = "</file>"{
+				updateNum++
+				fileFlg = 0
+			}
+			if strmid(k, 0, strlen("<path>")) = "<path>"{
+				index1 = instr(k, 0, "<path>") + strlen("<path>")
+				index2 = instr(k, 0, "</path>")
+				updatePath.updateNum = strmid(k, index1, index2 - index1)
+				if updatePath.updateNum = "" : fileFlg = 0 : continue
+			}
+			if strmid(k, 0, strlen("<update>")) = "<update>"{
+				index1 = instr(k, 0, "<update>") + strlen("<update>")
+				index2 = instr(k, 0, "</update>")
+				updateDate.updateNum = strmid(k, index1, index2 - index1)
+			}
+		}
+	loop
+}
+
+// 得られたタイトルのストーリーファイルを開いて要約取得
+maxPathStrSize = 0
+sdim summary, 1024, updateNum
+repeat updateNum
+	// スラッシュをバックスラッシュに置換
+	sdim buf
+	split updatePath.cnt, "/", buf
+	updatePath.cnt = ""
+	i = cnt
+	foreach buf
+		if cnt ! 0 : updatePath.i += "\\"
+		updatePath.i += buf.cnt
+	loop
+	if maxPathStrSize < strlen(updatePath.cnt){
+		maxPathStrSize = strlen(updatePath.cnt)
+	}
+	
+	exist "dat\\" + updatePath.cnt + ".story"
+	if strsize = -1{
+		summary.cnt = ""
+	}else{
+		notesel r
+		noteload "dat\\" + updatePath.cnt + ".story"
+		summaryFlg = 0
+		i = cnt
+		repeat notemax
+			noteget k, cnt
+			if summaryFlg = 0{
+				index = instr(k, 0, "<summary>")
+				if index ! -1{
+					index += strlen("<summary>")
+					summaryFlg = 1
+					k = strmid(k, index, strlen(k))
+					summary.i = ""
+				}
+			}
+			if summaryFlg = 1{
+				index = instr(k, 0, "</summary>")
+				if index = -1{
+					summary.i += k
+				}else{
+					summary.i += strmid(k, 0, index)
+					break
+				}
+				summary.i += "\n"
+			}
+		loop
+	}
+loop
+
+// 最終更新降順のID配列取得
+dim idarray, updateNum
+list = ""
+repeat updateNum
+	list += updateDate.cnt + strf("%08d", cnt) + "\n"
+loop
+sortnote list, 1
+notesel list
+repeat updateNum
+	noteget k, cnt
+	idarray.cnt = int(strmid(k, -1, 8))
+loop
+
+// 情報をもとにリスト作成
+list = ""
+repeat updateNum
+	dim buf
+	split updatePath.(idarray.cnt), "\\", buf
+	foreach buf
+		if cnt ! 0 : list += "/"
+		list += buf.cnt
+	loop
+	repeat (maxPathStrSize + 2) - strlen(updatePath.(idarray.cnt))
+		list += " "
+	loop
+	list += "(～" + strmid(updateDate.(idarray.cnt), 0, instr(updateDate.(idarray.cnt), 0, " ")) + ")  "
+	notesel summary.(idarray.cnt)
+	repeat notemax
+		noteget k, cnt
+		if cnt ! 0 : list += " "
+		list += k
+	loop
+	list += "\n"
+loop
+
+// スクリーンの表示
+*top
+storyOpenFlg = 0	// ストーリーのウィンドウ開いてる
+mainCloseFlg = 0	// メインウィンドウ閉じた
+optionFlg = 0		// オプション（要約変更中など）ウィンドウ
+screen 0, 640, 480, ,50, 50
+onexit *owari
+title tn
+cls 1
+pos 5, 35
+objsize 640 - 2 * 5, 480 - 5 - 35
+font "ＭＳ ゴシック", 16
+objmode 2
+listbox id, 0, list
+font "ＭＳ ゴシック", 14
+btTitle = "新規", "読み込み", "詳細表示", "再開", "要約変更", "更新"
+repeat 6
+	pos 5 + cnt * (640 - 2 * 5 - 100) / 5, 5 : objsize 100, 25 : button btTitle.cnt, *bt
+loop
+onkey *key
+stop
+
+// 無効なファイル名かどうか
+#defcfunc disable str itextsi, int flg	// 未入力は無効としないフラグ
+	textsi = itextsi
+	if textsi = "" & flg ! 1 : dialog "必須の未入力項目があります。\n何か入力してください。", 1, tn : return 1
+	disableFlg = 0
+	if instr(textsi, 0, "\t") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "\\") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "/") ! -1 : disableFlg = 1
+	if instr(textsi, 0, ":") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "*") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "?") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "\"") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "<") ! -1 : disableFlg = 1
+	if instr(textsi, 0, ">") ! -1 : disableFlg = 1
+	if instr(textsi, 0, "|") ! -1 : disableFlg = 1
+	if disableFlg = 1{
+		dialog "無効なテキストを含んだ項目があります。\n水平タブ、半角の \\ / : * ? \" < > | は使用できません。", 1, tn
+		return 1
+	}
+	return 0
+
+*key
+	if iparam = 13{
+		if id ! -1{
+			story = idarray.id
+			goto *load_story
+		}
+	}
+	stop
+	
+*bt
+	if id ! -1{
+		story = idarray.id
+	}else{
+		story = 0
+	}
+	switch stat
+	case 1 : goto *new : swbreak
+	case 2 : goto *load_story : swbreak
+	case 3 : goto *load_detail : swbreak
+	case 4 : goto *start : swbreak
+	case 5 : goto *change_summary : swbreak
+	case 6 : goto *update : swbreak
+	swend
+	stop
+	
+*new
+	onkey 0
+	if storyOpenFlg = 1{
+		gsel 1, -1
+		storyOpenFlg = 0
+	}
+	optionFlg = 1
+	storyPath = "" : storyTitle = "" : storySummary = ""
+	screen 0, 320, 280
+	cls 1
+	font "メイリオ", 14
+	objmode 2
+	pos 5, 5 : mes "作成パス :"
+	pos 80, 2 : input storyPath, 320 - 80 - 5 - 50, 28, 32 : storyPathId = stat
+	objsize 40, 24 : pos 320 - 50, 5 : button "...", *change_path
+	pos 5, 35 : mes "タイトル :"
+	pos 80, 32 : input storyTitle, 320 - 80 - 5, 28, 32
+	pos 5, 65 : mes "要約（後で変更可、未入力OK） :"
+	pos 5, 90 : mesbox storySummary, 320 - 2 * 5, 280 - 90 - 28 - 2 * 5, 1, 2048
+	objsize 152, 28
+	pos 5, 280 - 28 - 5 : button "OK", *ok_new
+	pos 162, 280 - 28 - 5 : button "キャンセル", *owari
+	stop
+
+*change_path
+	sdim si, 1024
+	selfolder si, "[ストーリーの作成パスの変更]\ndat以下のフォルダを選択してください。"
+	if stat = 0{
+		if instr(si, 0, url + "\\dat") ! -1{
+			storyPath = strmid(si, strlen(url + "\\dat"), strlen(si))
+			if strmid(storyPath, 0, 1) = "\\" : storyPath = strmid(storyPath, 1, strlen(storyPath))
+			dim buf
+			split storyPath, "\\", buf
+			storyPath = ""
+			foreach buf
+				if cnt ! 0 : storyPath += "/"
+				storyPath += buf.cnt
+			loop
+			objprm storyPathId, storyPath
+		}else{
+			dialog "dat以下のフォルダを選択してください。", 1, tn
+		}
+	}
+	stop
+	
+*ok_new
+	if storyPath != ""{
+		dim buf
+		split storyPath, "/", buf
+		failFlg = 0
+		foreach buf
+			if disable(buf.cnt, 0) = 1{
+				failFlg = 1
+				break
+			}
+		loop
+	}
+	if failFlg = 1 : stop
+	if disable(storyTitle, 0) = 1 : stop
+	if disable(storySummary, 1) = 1 : stop
+	
+	if storyPath ! "" : storyPath += "/"
+	text = "［SkypeStoryRecorder : Title］" + storyPath + storyTitle + "\n"
+	if storySummary ! ""{
+		text += "［SkypeStoryRecorder : Summary］\n"
+		text += storySummary + "\n"
+		text += "［SkypeStoryRecorder : EndSummary］\n"
+	}
+	clipset text
+	copyMessage
+	
+	goto *top
+	stop
+
+#deffunc load str path
+	exist path
+	if strsize = -1{
+		dialog "テキストファイルが見つかりません。\nファイルに不正にアクセスされた可能性があります。", 1, tn
+	}else{
+		oncmd 0
+		notesel text
+		noteload path
+		screen 1, ginfo_dispx, ginfo_dispy, 2, 100, 100, ginfo_dispx * 2 / 3, ginfo_dispy * 2 / 3
+		title path
+		gsel 1, 1
+		font "メイリオ", 14
+		objmode 2
+		mesbox text, ginfo_dispx * 2 / 3, ginfo_dispy * 2 / 3, 0, notesize + 100
+		storyOpenFlg = 1
+		oncmd gosub *change_winsize, WM_SIZE
+		oncmd 1
+	}
+	return
+	
+*load_story
+	if updateNum = 0{
+		dialog "ストーリーがまだありません。", 1, tn
+		stop
+	}
+	load "story\\" + updatePath.story + ".txt"
+	stop
+	
+*load_detail
+	if updateNum = 0{
+		dialog "ストーリーがまだありません。", 1, tn
+		stop
+	}
+	load "story\\" + updatePath.story + "_detail.txt"
+	stop
+	
+*start
+	if updateNum = 0{
+		dialog "ストーリーがまだありません。", 1, tn
+		stop
+	}
+	text = "［SkypeStoryRecorder : Title］"
+	dim buf
+	split updatePath.story, "\\", buf
+	foreach buf
+		if cnt ! 0 : text += "/"
+		text += buf.cnt
+	loop
+	text += "\n"
+	clipset text
+	copyMessage
+	stop
+	
+*change_summary
+	if updateNum = 0{
+		dialog "ストーリーがまだありません。", 1, tn
+		stop
+	}
+	onkey 0
+	if storyOpenFlg = 1{
+		gsel 1, -1
+		storyOpenFlg = 0
+	}
+	optionFlg = 1
+	dim buf
+	split updatePath.story, "/", buf
+	storyPath = "" : storyTitle = buf.(length(buf) - 1) : storySummary = summary.story
+	repeat length(buf) - 1
+		if cnt ! 0 : storyPath += "/"
+		storyPath += buf.cnt
+	loop
+	screen 0, 320, 280
+	cls 1
+	font "メイリオ", 14
+	objmode 2
+	pos 5, 5 : mes "作成パス :"
+	pos 80, 2 : input storyPath, 320 - 80 - 5 - 50, 28, 32 : objenable stat, 0
+	objsize 40, 24 : pos 320 - 50, 5 : button "...", *change_path : objenable stat, 0
+	pos 5, 35 : mes "タイトル :"
+	pos 80, 32 : input storyTitle, 320 - 80 - 5, 28, 32 : objenable stat, 0
+	pos 5, 65 : mes "要約（後で変更可、未入力OK） :"
+	pos 5, 90 : mesbox storySummary, 320 - 2 * 5, 280 - 90 - 28 - 2 * 5, 1, 2048
+	objsize 152, 28
+	pos 5, 280 - 28 - 5 : button "OK", *ok_summary
+	pos 162, 280 - 28 - 5 : button "キャンセル", *owari
+	stop
+	
+*ok_summary
+	if disable(storySummary, 1) = 1 : stop
+	
+	text = ""
+	if storySummary ! ""{
+		text += "［SkypeStoryRecorder : Summary］\n"
+		text += storySummary + "\n"
+		text += "［SkypeStoryRecorder : EndSummary］\n"
+	}
+	clipset text
+	copyMessage
+	
+	goto *top
+	stop
+	
+*update
+	// 更新処理はC++のほうに委ねる
+	exec "SkypeStoryRecorder.exe \"" + tn + ".exe\""
+	end
+	
+*change_winsize
+	winsize = ginfo_winx, ginfo_winy, 0, 0
+	resizeobj 0, winsize, 1
+	return
+	
+*owari
+	if optionFlg = 1{
+		goto *top
+	}
+	switch ginfo_act
+	case 0:
+		if storyOpenFlg = 1{
+			gsel 0, -1
+			mainCloseFlg = 1
+			gsel 1
+		}else{
+			end
+		}
+		swbreak
+	case 1:
+		if mainCloseFlg = 1{
+			end
+		}else{
+			gsel 1, -1
+			storyOpenFlg = 0
+		}
+		swbreak
+	swend
+	stop
+	

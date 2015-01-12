@@ -73,6 +73,7 @@ vector<Sentence> DataConverter::ExtractSentences(){
 
 	int counter = 0;
 	int countRate = 0;
+	bool convertStartFlg = false;	// 最初の日付が現れて、コンバートを開始するフラグ
 	while(!ss.eof()){
 		string buf, tmp;
 		getline(ss, buf);
@@ -91,6 +92,7 @@ vector<Sentence> DataConverter::ExtractSentences(){
 
 		// 先頭が日付かどうかで分岐
 		if(regex_search(buf, regex("\\[.*\\] .*"))){
+			convertStartFlg = true;	// 日付が来てから、非日付のテキストを読み始める
 
 			if (sentence.makeDate != Date()){
 				ret.push_back(sentence);
@@ -148,6 +150,10 @@ vector<Sentence> DataConverter::ExtractSentences(){
 		}
 
 		// 以後、日付関係なしの共通部分
+		if (!convertStartFlg){
+			// 日付がまだ一つも見つかってないのに以後をストーリーとは見なさない
+			continue;
+		}
 
 		// \rあったら以後消す
 		int pos = buf.find("\r");
