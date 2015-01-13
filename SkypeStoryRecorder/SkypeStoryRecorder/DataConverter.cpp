@@ -91,7 +91,7 @@ vector<Sentence> DataConverter::ExtractSentences(){
 		}
 
 		// 先頭が日付かどうかで分岐
-		if(regex_search(buf, regex("\\[.*\\] .*"))){
+		if(regex_search(buf, regex("^\\[.*\\] .*"))){
 			convertStartFlg = true;	// 日付が来てから、非日付のテキストを読み始める
 
 			if (sentence.makeDate != Date()){
@@ -99,9 +99,11 @@ vector<Sentence> DataConverter::ExtractSentences(){
 				sentence = Sentence();
 			}
 
+			int index1 = buf.find("[");
+			int index2 = buf.find("]") + 1;
+			string date = buf.substr(index1, index2 - index1);
+
 			smatch match;
-			regex_search(buf, match, regex("^\\[.*\\]"));
-			string date = *match.begin();	// []内の日付を表す文字列
 
 			if (regex_search(date, regex("\\[.* \\| .*を編集しました\\]"))){
 				sentence.state = Sentence::State::edited;
