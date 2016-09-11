@@ -118,6 +118,11 @@ vector<Story> SentenceDecoder::CreateStoryList(){
 						summaryFlg = true;
 						buf = "";
 					}
+					else if (buf == common::GetIgnoreDateCommand()){
+						// 日時更新しないセンテンス
+						p.ignoreDateFlg = true;
+						buf = "";
+					}
 					else{
 						// その他 ： キャラクター名を検索して、リストに追加するキャラ名を選定
 						if (!readTextFlg){
@@ -150,8 +155,10 @@ vector<Story> SentenceDecoder::CreateStoryList(){
 			unknownStoryFlg = true;	// ストーリー名が不明のままだった場合、不明フラグを立てる
 		}
 
-		finalDate = p.makeDate;	// 最終センテンス日時は「作成日時」を順次更新
-		common::SubstituteMax(updateDate, p.GetFinalUpdate());	// 最終更新日は最新のものだけ取り出せるように
+		if (!p.ignoreDateFlg){
+			finalDate = p.makeDate;	// 最終センテンス日時は「作成日時」を順次更新
+			common::SubstituteMax(updateDate, p.GetFinalUpdate());	// 最終更新日は最新のものだけ取り出せるように
+		}
 	}
 
 	// 最後に残ったストーリーをpush

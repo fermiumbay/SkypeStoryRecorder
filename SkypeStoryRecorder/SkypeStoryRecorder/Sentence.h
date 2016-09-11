@@ -17,6 +17,7 @@ struct Sentence{
 		text,	// テキスト本文
 		note;	// 注釈文
 	State state;	// センテンスの状態
+	bool ignoreDateFlg;	// 日付更新しないフラグ
 
 	Sentence() :
 		makeDate(Date()),
@@ -24,7 +25,8 @@ struct Sentence{
 		speaker(""),
 		text(""),
 		note(""),
-		state(State::normal)
+		state(State::normal),
+		ignoreDateFlg(false)
 		{}
 
 	// センテンスの最終的な更新日時を取得
@@ -39,6 +41,7 @@ struct Sentence{
 			&& speaker == s.speaker
 			&& text == s.text
 			&& note == s.note
-			&& state == s.state;
+			&& state == s.state
+			&& ignoreDateFlg == s.ignoreDateFlg;
 	}
 };

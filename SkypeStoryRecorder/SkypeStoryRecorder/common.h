@@ -39,6 +39,8 @@ public:
 	static const string GetNewStoryCommand(){ return "［SkypeStoryRecorder : Title］"; }	// 新規ストーリー作成コマンド
 	static const string GetSummaryCommand(){ return "［SkypeStoryRecorder : Summary］"; }	// 要約編集コマンド
 	static const string GetEndSummaryCommand(){ return "［SkypeStoryRecorder : EndSummary］"; }	// 要約編集終了コマンド
+	static const string GetIgnoreDateCommand(){ return "［SkypeStoryRecorder : IgnoreDate］"; }	// このセンテンスは日付更新しないコマンド
+	static const regex GetURLRegex(){ return regex("(https?|ftp)(:\\/\\/[-_.!~*\\'()a-zA-Z0-9;\\/?:\\@&=+\\$,%#]+)"); }	// URLと判定する正規表現（http://phpspot.net/php/pg%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE%EF%BC%9A%E6%AD%A3%E3%81%97%E3%81%84%EF%BC%B5%EF%BC%B2%EF%BC%AC%E3%81%8B%E3%81%A9%E3%81%86%E3%81%8B%E8%AA%BF%E3%81%B9%E3%82%8B.html）
 
 	static string ItoS(int value);	// 整数を文字列に変換
 	static string ItoS(int value, int num);	// 整数を文字列に変換（第二引数で桁数指定）

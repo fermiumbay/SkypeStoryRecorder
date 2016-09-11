@@ -1,5 +1,5 @@
-#define tn "スカイプ物語レコーダー"
-#packopt name tn
+#define tn "スカイプ物語レコーダー ver1.01"
+#packopt name "スカイプ物語レコーダー"
 #packopt hide 1
 #include "obj.as"
 #define WM_SIZE 5
@@ -9,6 +9,7 @@
 
 #define UpdateFilePath "dat\\update.dat"
 #define copyMessage dialog "コマンドをテキストとしてコピーしました。\nスカイプのメッセージボックスに貼り付けてください。\n各データはストーリーの更新時に適用されます。", , tn
+#define copySummaryMessage dialog "コマンドをテキストとしてコピーしました。\nスカイプのメッセージボックスに貼り付けた後に\n更新すると要約の変更が適用されます。\n要約変更後はその話が再開されます。", , tn
 
 url = dir_cur
 
@@ -370,14 +371,23 @@ stop
 *ok_summary
 	if disable(storySummary, 1) = 1 : stop
 	
-	text = ""
+	text = "［SkypeStoryRecorder : Title］"
+	dim buf
+	split updatePath.story, "\\", buf
+	foreach buf
+		if cnt ! 0 : text += "/"
+		text += buf.cnt
+	loop
+	text += "\n"
+	
 	if storySummary ! ""{
 		text += "［SkypeStoryRecorder : Summary］\n"
 		text += storySummary + "\n"
 		text += "［SkypeStoryRecorder : EndSummary］\n"
+		text += "［SkypeStoryRecorder : IgnoreDate］\n"
 	}
 	clipset text
-	copyMessage
+	copySummaryMessage
 	
 	goto *top
 	stop

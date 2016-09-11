@@ -4,7 +4,7 @@
 #include "DataConverter.h"
 #include "DataManager.h"
 #include "SentenceDecoder.h"
-#include <windows.h>
+#include <Windows.h>
 
 // スカイプ物語レコーダー
 class SkypeStoryRecorder{

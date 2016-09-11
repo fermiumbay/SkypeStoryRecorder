@@ -179,6 +179,11 @@ vector<Sentence> DataConverter::ExtractSentences(){
 				sentence.note += buf;
 			}
 		}
+		else if (regex_match(buf, common::GetURLRegex())){
+			// URL‚¾‚¯‚Ìs‚Í’ß‚Ìˆê•”‚Æ”»’è
+			sentence.note += buf + "\n";
+			buf = "";
+		}
 		else{
 			while (buf != ""){
 

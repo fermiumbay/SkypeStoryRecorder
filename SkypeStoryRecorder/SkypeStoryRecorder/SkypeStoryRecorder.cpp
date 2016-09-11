@@ -115,6 +115,7 @@ bool SkypeStoryRecorder::SaveStory(string title, DataManager *dataManager, bool 
 }
 
 SkypeStoryRecorder::SkypeStoryRecorder(bool txtStoryOutputFlg, bool txtDetailOutputFlg){
+	cout << "[SkypeStoryRecorder ver1.01]" << endl;
 	this->txtStoryOutputFlg = txtStoryOutputFlg;
 	this->txtDetailOutputFlg = txtDetailOutputFlg;
 }
